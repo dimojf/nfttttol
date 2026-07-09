@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মাল্টি-ফাংশনাল ওয়েব টুলস</title>
+    <!-- GIF তৈরি করার জন্য gifshot লাইব্রেরি -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --success-hover: #059669;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* সুন্দর নেভিগেশন ট্যাব */
+        .nav-container {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px;
+            border-radius: 50px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: white;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* মূল কন্টেইনার */
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 550px;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h2 {
+            margin: 0;
+            color: var(--text-dark);
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* ফর্ম উপাদানসমূহ */
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.75rem;
+            background: #f9fafb;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input[type="file"]:hover {
+            border-color: var(--primary);
+            background: #f3f4f6;
+        }
+
+        .range-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .range-group .form-group {
+            flex: 1;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* বাটনসমূহ */
+        .btn-action {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-hover);
+        }
+
+        /* মেসেজ ও লোডিং */
+        #message {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            min-height: 20px;
+        }
+
+        .success { color: var(--success); }
+        .error { color: #dc2626; }
+
+        #loading { 
+            display: none; 
+            margin-top: 20px; 
+            font-weight: bold; 
+            color: var(--primary); 
+            text-align: center;
+        }
+
+        /* প্রিভিউ ও ডাউনলোড */
+        .preview-container { 
+            margin-top: 25px; 
+            text-align: center;
+        }
+
+        #preview img { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            border: 2px solid #E5E7EB; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .download-link {
+            display: none;
+            margin-top: 20px;
+            background-color: var(--success);
+            color: white;
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .download-link:hover { 
+            background-color: var(--success-hover); 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- টুলস পরিবর্তন করার জন্য নেভিগেশন বার -->
+    <div class="nav-container">
+        <button class="nav-btn active" onclick="switchTab('gif-maker', this)">🖼️ GIF মেকার</button>
+        <button class="nav-btn" onclick="switchTab('json-splitter', this)">⚙️ JSON স্প্লিটার</button>
+    </div>
+
+    <!-- প্রথম ওয়েবসাইট: স্মার্ট GIF মেকার -->
+    <div id="gif-maker" class="container active">
+        <div class="header">
+            <h2>অ্যানিমেটেড GIF মেকার</h2>
+            <p>সিরিয়াল অনুযায়ী ছবি আপলোড করে সহজেই GIF তৈরি করুন</p>
+        </div>
+
+        <div class="form-group">
+            <label for="image-upload">ছবি নির্বাচন করুন (একাধিক সিলেক্ট করা যাবে):</label>
+            <input type="file" id="image-upload" accept="image/*" multiple>
+            <small style="color: var(--primary); display: block; margin-top: 8px; font-weight: 500;" id="file-count">কোনো ছবি নির্বাচিত হয়নি</small>
+        </div>
+
+        <div class="form-group">
+            <label for="interval-input">ফ্রেম পরিবর্তনের সময় (সেকেন্ডে):</label>
+            <input type="number" id="interval-input" step="0.1" value="0.3" min="0.1">
+        </div>
+
+        <button class="btn-action" onclick="createGIF()">GIF তৈরি করুন</button>
+
+        <div id="loading">GIF তৈরি হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন... ⏳</div>
+
+        <div class="preview-container">
+            <div id="preview"></div>
+            <a id="download-gif-btn" class="download-link" href="#" download="my-animated.gif">⬇️ GIF ডাউনলোড করুন</a>
+        </div>
+    </div>
+
+    <!-- দ্বিতীয় ওয়েবসাইট: JSON Prompt Splitter -->
+    <div id="json-splitter" class="container">
+        <div class="header">
+            <h2>JSON File Splitter</h2>
+            <p>বড় JSON ফাইল থেকে নির্দিষ্ট ID রেঞ্জ আলাদা করুন</p>
+        </div>
+
+        <div class="form-group">
+            <label for="jsonFile">JSON ফাইল আপলোড করুন:</label>
+            <input type="file" id="jsonFile" accept=".json">
+        </div>
+
+        <div class="range-group">
+            <div class="form-group">
+                <label for="startId">শুরুর ID (Start):</label>
+                <input type="number" id="startId" placeholder="যেমন: 1" min="1">
+            </div>
+            <div class="form-group">
+                <label for="endId">শেষ ID (End):</label>
+                <input type="number" id="endId" placeholder="যেমন: 1000" min="1">
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="processAndDownloadJSON()">ডাউনলোড করুন</button>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // ট্যাব পরিবর্তন করার লজিক
+        function switchTab(tabId, btn) {
+            // সব কন্টেইনার হাইড করা
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+            // সব বাটনের অ্যাক্টিভ ক্লাস রিমুভ করা
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            // নির্দিষ্ট কন্টেইনার ও বাটন অ্যাক্টিভ করা
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ================= GIF মেকার স্ক্রিপ্ট =================
+        let uploadedImages = [];
+
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const files = event.target.files;
+            uploadedImages = []; 
+            const fileCountText = document.getElementById('file-count');
+
+            if (files.length === 0) {
+                fileCountText.innerText = "কোনো ছবি নির্বাচিত হয়নি";
+                return;
+            }
+
+            fileCountText.innerText = `${files.length} টি ছবি লোড হচ্ছে...`;
+            let loadedCount = 0;
+
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImages[index] = e.target.result;
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        fileCountText.innerText = `✅ ${files.length} টি ছবি সফলভাবে আপলোড হয়েছে!`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function createGIF() {
+            if (uploadedImages.length === 0) {
+                alert("দয়া করে প্রথমে ছবি আপলোড করুন!");
+                return;
+            }
+
+            const interval = parseFloat(document.getElementById('interval-input').value) || 0.3;
+            const loadingText = document.getElementById('loading');
+            const previewDiv = document.getElementById('preview');
+            const downloadBtn = document.getElementById('download-gif-btn');
+
+            previewDiv.innerHTML = '';
+            downloadBtn.style.display = 'none';
+            loadingText.style.display = 'block';
+
+            const firstImage = new Image();
+            firstImage.onload = function() {
+                gifshot.createGIF({
+                    images: uploadedImages,
+                    interval: interval, 
+                    gifWidth: firstImage.width,
+                    gifHeight: firstImage.height,
+                    numWorkers: 2
+                }, function(obj) {
+                    loadingText.style.display = 'none';
+
+                    if (!obj.error) {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = obj.image;
+                        previewDiv.appendChild(imgElement);
+
+                        downloadBtn.href = obj.image;
+                        downloadBtn.style.display = 'block'; // সঠিকভাবে ব্লক হিসেবে প্রদর্শন
+                    } else {
+                        alert("দুঃখিত, GIF তৈরি করতে কোনো সমস্যা হয়েছে! দয়া করে ছোট সাইজের ছবি ব্যবহার করুন।");
+                    }
+                });
+            };
+            firstImage.src = uploadedImages[0];
+        }
+
+        // ================= JSON স্প্লিটার স্ক্রিপ্ট =================
+        let jsonData = null;
+
+        document.getElementById('jsonFile').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    jsonData = JSON.parse(e.target.result);
+                    if (!Array.isArray(jsonData)) {
+                        showJSONMessage("ত্রুটি: JSON ফাইলটি একটি Array ফরমেটে হতে হবে।", "error");
+                        jsonData = null;
+                    } else {
+                        showJSONMessage(`সফলভাবে ফাইল লোড হয়েছে। মোট ডেটা: ${jsonData.length} টি`, "success");
+                    }
+                } catch (error) {
+                    showJSONMessage("ত্রুটি: এটি সঠিক JSON ফাইল নয়।", "error");
+                    jsonData = null;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function processAndDownloadJSON() {
+            if (!jsonData) {
+                showJSONMessage("অনুগ্রহ করে প্রথমে একটি সঠিক JSON ফাইল আপলোড করুন।", "error");
+                return;
+            }
+
+            const startId = parseInt(document.getElementById('startId').value);
+            const endId = parseInt(document.getElementById('endId').value);
+
+            if (isNaN(startId) || isNaN(endId)) {
+                showJSONMessage("অনুগ্রহ করে শুরুর এবং শেষ ID সঠিকভাবে দিন।", "error");
+                return;
+            }
+
+            if (startId > endId) {
+                showJSONMessage("শুরুর ID শেষ ID থেকে বড় হতে পারে না!", "error");
+                return;
+            }
+
+            const filteredData = jsonData.filter(item => {
+                const currentId = parseInt(item.id);
+                return currentId >= startId && currentId <= endId;
+            });
+
+            if (filteredData.length === 0) {
+                showJSONMessage("এই রেঞ্জের মধ্যে কোনো ডেটা পাওয়া যায়নি!", "error");
+                return;
+            }
+
+            const jsonString = JSON.stringify(filteredData, null, 2);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `prompts_${startId}_to_${endId}.json`;
+            document.body.appendChild(a);
+            a.click();
+            
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showJSONMessage(`সফলভাবে ${filteredData.length} টি ডেটা ডাউনলোড হয়েছে!`, "success");
+        }
+
+        function showJSONMessage(text, type) {
+            const msgElement = document.getElementById('message');
+            msgElement.textContent = text;
+            msgElement.className = type;
+        }
+    </script>
+</body>
+</html>
